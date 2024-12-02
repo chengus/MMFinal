@@ -1,35 +1,116 @@
 from nanonav import BLE, NanoBot
 import time
 
-### test motors and encoders ###
-
 # Create a NanoBot object
 robot = NanoBot()
 
-# Move forward for 2 seconds
-print(f'encoder 1 start: {robot.get_enc1()}')
-robot.m1_forward(30)
-robot.m2_forward(30)
-time.sleep(2)
-print(f'encoder 1 end: {robot.get_enc1()}')
+#travel directions 1 square each
+def forward(robot):     #1
+    while True:
+        if not robot.ir_left() and not robot.ir_right():
+            robot.m1_forward(17)
+            robot.m2_forward(17)
+            time.sleep(0.1)
+            robot.stop()
+            time.sleep(0)
+        elif robot.ir_left() and not robot.ir_right():
+            robot.m1_forward(20)
+            robot.m2_backward(20)
+            time.sleep(0.2)
+            robot.stop()
+            time.sleep(0)
+        elif not robot.ir_left() and robot.ir_right():
+            robot.m2_forward(20)
+            robot.m1_backward(20)
+            time.sleep(0.2)
+            robot.stop()
+            time.sleep(0)
+        elif robot.ir_left() and robot.ir_right():
+            robot.m1_forward(20)
+            robot.m2_forward(20)
+            time.sleep(1.25)
+            robot.stop()
+            time.sleep(0)
+            break
 
-# Stop
-robot.stop()
-time.sleep(2)
+def down(robot):    #3?????
+    robot.m1_backward(20)
+    robot.m2_forward(20)
+    time.sleep(2)
+    robot.stop()
+    time.sleep(0)
+    forward(robot)
+    robot.m1_backward(20)
+    robot.m2_forward(20)
+    time.sleep(2)
+    robot.stop()
+    time.sleep(0)
 
-# Move backward for 2 seconds
-print(f'encoder 2 start: {robot.get_enc2()}')
-robot.m1_backward(30)
-robot.m2_backward(30)
-time.sleep(2)
-print(f'encoder 2 end: {robot.get_enc2()}')
+def right(robot):   #2
+    robot.m1_backward(20)
+    robot.m2_forward(20)
+    time.sleep(0.8)
+    robot.stop()
+    time.sleep(0)
+    forward(robot)
+    robot.m2_backward(20)
+    robot.m1_forward(20)
+    time.sleep(0.8)
+    robot.stop()
+    time.sleep(0)
 
-# Stop
-robot.stop()
+def left(robot):
+    robot.m2_backward(20)
+    robot.m1_forward(20)
+    time.sleep(0.8)
+    robot.stop()
+    time.sleep(0)
+    forward(robot)
+    robot.m1_backward(20)
+    robot.m2_forward(20)
+    time.sleep(0.8)
+    robot.stop()
+    time.sleep(0)
 
-### test Bluetooth ###
+ble = BLE(name="NanoNav1")
+ble.send(0)
+response = ble.read()
 
-# Create a Bluetooth object
+while True:
+    #no motion
+    if response == 0:
+        response = ble.read()
+
+    #move forward 1
+    elif response == 1:
+        forward(robot)
+        ble.send(0)
+        response = ble.read()
+        #y += 1     coordinate
+
+    #move right
+    elif response == 2:
+        right(robot)
+        ble.send(0)
+        response = ble.read()
+        #x += 1
+
+    #move down
+    elif response == 3:
+        down(robot)
+        ble.send(0)
+        reponse = ble.read()
+        #x -= 1
+
+    #move left
+    elif reponse == 4:
+        left(robot)
+        ble.send(0)
+        reponse = ble.read()
+        #x -= 1
+    else:
+        break
+
 ble = BLE(name="NanoNav")
 
 ble.send(43)
