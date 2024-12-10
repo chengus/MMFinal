@@ -15,5 +15,6 @@ Minds &amp; Machine Final Project
 
 
 **Theoretically, the program only works on mac due to the console clearing command, but it is not tested on other platforms.* 
+
 **Color coding may not work on all IDE (Mac Terminal works)* 
 
